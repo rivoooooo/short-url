@@ -10,18 +10,29 @@
     <script src="//unpkg.com/alpinejs" defer></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script defer src="https://c.planetrenox.com/tracker.js"></script>
+    <style>
+      body{background:#f4f1ea;background-image:linear-gradient(#d8d3ca 1px,transparent 1px),linear-gradient(90deg,#d8d3ca 1px,transparent 1px);background-size:28px 28px}
+      .admin-shell{background:#fffdf8;border:1px solid #171717;box-shadow:8px 8px 0 #171717}
+      .admin-input{background:#fffdf8!important;border:1px solid #171717!important;border-radius:0!important;color:#171717!important}
+      .admin-input:focus{outline:3px solid #2563eb!important;outline-offset:2px;box-shadow:none!important}
+      .admin-button{border:1px solid #171717!important;border-radius:0!important;box-shadow:3px 3px 0 #171717}
+      .admin-button:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 #171717}
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-200 min-h-screen flex items-center justify-center font-sans text-sm">
-    <div x-data="adminPage()" class="max-w-xl w-full p-6 text-center">
-        <h1 class="text-xl font-bold mb-4">Admin Panel</h1>
+<body class="text-zinc-950 min-h-screen flex items-center justify-center font-sans text-sm p-5">
+    <div x-data="adminPage()" class="admin-shell max-w-2xl w-full p-6 md:p-8 text-center">
+        <div class="flex items-center justify-between border-b border-zinc-950 pb-4 mb-6">
+          <h1 class="text-xl font-bold uppercase tracking-tight">Admin Panel</h1>
+          <span class="bg-[#ff5c35] border border-zinc-950 px-2 py-1 text-[10px] font-bold uppercase tracking-wider">Control</span>
+        </div>
 
         <template x-if="!authenticated">
-            <form @submit.prevent="authenticated = !!password" class="space-y-3 max-w-xs mx-auto">
+            <form @submit.prevent="authenticated = !!password" class="space-y-4 max-w-xs mx-auto text-left">
                 <div>
-                    <label for="adminPass" class="block text-xs font-medium text-slate-400 mb-1">Enter Admin Password</label>
-                    <input x-model="password" type="password" id="adminPass" required class="w-full p-2 bg-slate-800 border border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-sky-500 text-xs">
+                    <label for="adminPass" class="block text-xs font-bold uppercase tracking-wider text-zinc-600 mb-2">Enter Admin Password</label>
+                    <input x-model="password" type="password" id="adminPass" required class="admin-input w-full p-3 text-xs">
                 </div>
-                <button type="submit" class="w-full py-2 font-semibold rounded text-white bg-sky-600 hover:bg-sky-700 transition-colors text-xs">
+                <button type="submit" class="admin-button w-full py-3 font-semibold text-white bg-[#2563eb] hover:bg-[#1d4ed8] transition-all text-xs">
                     Unlock
                 </button>
             </form>
@@ -29,52 +40,52 @@
 
         <template x-if="authenticated">
             <div class="space-y-6">
-                <div class="flex flex-wrap justify-center gap-2">
-                    <button @click="runAction('create-users-v1')" :disabled="loading" class="px-3 py-2 font-semibold rounded bg-indigo-600 hover:bg-indigo-700 transition-colors disabled:opacity-50 text-xs">
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button @click="runAction('create-users-v1')" :disabled="loading" class="admin-button px-3 py-2 font-semibold bg-[#2563eb] text-white hover:bg-blue-700 transition-all disabled:opacity-50 text-xs">
                         Init Users v1
                     </button>
-                    <button @click="runAction('migrate-users-v2')" :disabled="loading" class="px-3 py-2 font-semibold rounded bg-violet-600 hover:bg-violet-700 transition-colors disabled:opacity-50 text-xs">
+                    <button @click="runAction('migrate-users-v2')" :disabled="loading" class="admin-button px-3 py-2 font-semibold bg-[#ffd84d] text-zinc-950 hover:bg-yellow-300 transition-all disabled:opacity-50 text-xs">
                         Migrate Users v2
                     </button>
-                    <button @click="runAction('create-analytics-v1')" :disabled="loading" class="px-3 py-2 font-semibold rounded bg-emerald-600 hover:bg-emerald-700 transition-colors disabled:opacity-50 text-xs">
+                    <button @click="runAction('create-analytics-v1')" :disabled="loading" class="admin-button px-3 py-2 font-semibold bg-[#68d391] text-zinc-950 hover:bg-green-300 transition-all disabled:opacity-50 text-xs">
                         Init Analytics v1
                     </button>
-                    <button @click="runAction('read-schema')" :disabled="loading" class="px-3 py-2 font-semibold rounded bg-slate-700 hover:bg-slate-600 transition-colors disabled:opacity-50 text-xs">
+                    <button @click="runAction('read-schema')" :disabled="loading" class="admin-button px-3 py-2 font-semibold bg-zinc-950 text-white hover:bg-zinc-700 transition-all disabled:opacity-50 text-xs">
                         Read Schema
                     </button>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 border-t border-slate-700 pt-6">
-                    <div>
-                        <h2 class="text-xs font-bold mb-2 text-rose-400 uppercase tracking-wider">Takedown Link</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 border-t border-zinc-950 pt-6">
+                    <div class="border border-zinc-950 p-4 text-left">
+                        <h2 class="text-xs font-bold mb-3 text-rose-700 uppercase tracking-wider">Takedown Link</h2>
                         <form @submit.prevent="seizeLink" class="flex flex-col gap-2">
-                            <input x-model="takedownSlug" type="text" placeholder="Slug" required class="p-2 bg-slate-800 border border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-rose-500 text-xs">
-                            <button type="submit" :disabled="loading" class="py-2 font-semibold rounded bg-rose-600 hover:bg-rose-700 transition-colors disabled:opacity-50 text-xs">
+                            <input x-model="takedownSlug" type="text" placeholder="Slug" required class="admin-input p-3 text-xs">
+                            <button type="submit" :disabled="loading" class="admin-button py-2 font-semibold bg-[#ff5c35] hover:bg-orange-500 transition-all disabled:opacity-50 text-xs">
                                 Seize
                             </button>
                         </form>
                     </div>
-                    <div>
-                        <h2 class="text-xs font-bold mb-2 text-orange-400 uppercase tracking-wider">Ban User</h2>
+                    <div class="border border-zinc-950 p-4 text-left">
+                        <h2 class="text-xs font-bold mb-3 text-orange-700 uppercase tracking-wider">Ban User</h2>
                         <form @submit.prevent="banUser" class="flex flex-col gap-2">
-                            <input x-model="banUsername" type="text" placeholder="Username" required class="p-2 bg-slate-800 border border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-orange-500 text-xs">
-                            <input x-model="banDays" type="number" placeholder="Days" required class="p-2 bg-slate-800 border border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-orange-500 text-xs">
-                            <button type="submit" :disabled="loading" class="py-2 font-semibold rounded bg-orange-600 hover:bg-orange-700 transition-colors disabled:opacity-50 text-xs">
+                            <input x-model="banUsername" type="text" placeholder="Username" required class="admin-input p-3 text-xs">
+                            <input x-model="banDays" type="number" placeholder="Days" required class="admin-input p-3 text-xs">
+                            <button type="submit" :disabled="loading" class="admin-button py-2 font-semibold bg-[#ffd84d] hover:bg-yellow-300 transition-all disabled:opacity-50 text-xs">
                                 Ban
                             </button>
                         </form>
                     </div>
                 </div>
 
-                <div class="min-h-[8rem] bg-slate-800 rounded p-3 border border-slate-700 text-left text-xs font-mono">
+                <div class="min-h-[8rem] bg-[#171717] p-4 border border-zinc-950 text-left text-xs font-mono">
                     <div x-show="loading" class="flex justify-center items-center h-full">
-                         <i data-lucide="loader-2" class="animate-spin w-6 h-6 text-slate-400"></i>
+                         <i data-lucide="loader-2" class="animate-spin w-6 h-6 text-white"></i>
                     </div>
-                    <p x-show="error" class="text-rose-400" x-text="error"></p>
-                    <pre x-show="output" class="text-slate-300 whitespace-pre-wrap break-all" x-text="output"></pre>
-                    <p x-show="!loading && !error && !output" class="text-slate-500 text-center pt-8">Output...</p>
+                    <p x-show="error" class="text-[#ff8a6c]" x-text="error"></p>
+                    <pre x-show="output" class="text-white whitespace-pre-wrap break-all" x-text="output"></pre>
+                    <p x-show="!loading && !error && !output" class="text-zinc-400 text-center pt-8">Output...</p>
                 </div>
-                 <a href="/" class="mt-4 inline-block text-sky-500 hover:underline text-xs">&larr; Back to home</a>
+                 <a href="/" class="mt-5 inline-block border-b border-zinc-950 text-zinc-950 hover:text-[#2563eb] text-xs">&larr; Back to home</a>
             </div>
         </template>
     </div>
