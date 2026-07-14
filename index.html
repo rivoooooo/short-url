@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdgeLink - URL Shortener</title>
+    <meta name="description" content="Create custom, permanent short links with analytics. No expiration dates. Open source.">
+    <meta name="keywords" content="url shortener, link shortener, custom slug, permanent links, analytics, free">
+    <link rel="icon" href="/public/icon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=architects-daughter:400" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=jetbrains-mono:400,500" rel="stylesheet" />
+    <style>
+      :root{
+        --font-ui:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+        --font-display:"Architects Daughter","Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+        --font-mono:"JetBrains Mono",ui-monospace,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace
+      }
+      body{font-family:var(--font-ui)}
+      .font-display{font-family:var(--font-display)}
+      .font-mono-custom{font-family:var(--font-mono)}
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200 min-h-screen flex items-center justify-center overflow-hidden">
+    <script>if(localStorage.getItem("username"))window.location.href="/dash/";</script>
+
+    <div class="absolute top-0 left-0 w-72 h-72 bg-gradient-to-tr from-violet-600 to-rose-600 rounded-full filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 right-0 w-72 h-72 bg-gradient-to-br from-blue-600 to-green-600 rounded-full filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <main x-data="{ view:'landing' }" class="relative z-10 w-full max-w-md mx-auto p-4 text-center">
+        <div
+          x-show="view==='landing'"
+          x-transition:enter="transition ease-out duration-300"
+          x-transition:enter-start="opacity-0 transform scale-90"
+          x-transition:enter-end="opacity-100 transform scale-100"
+          x-transition:leave="transition ease-in duration-200"
+          x-transition:leave-start="opacity-100 transform scale-100"
+          x-transition:leave-end="opacity-0 transform scale-90"
+        >
+            <h1 class="text-5xl mb-2 flex items-center justify-center gap-3 font-display tracking-tight">
+                <i data-lucide="link" class="w-10 h-10"></i>
+                <span class="leading-none" data-site-host>EdgeLink</span>
+            </h1>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 text-[10px] font-semibold mb-3 uppercase tracking-[0.16em]">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Now with analytics!
+            </div>
+            <p class="text-slate-400 mb-8 max-w-sm mx-auto text-sm">
+                If you want short custom urls, like url shortening to a custom slug, our platform is for you.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  @click="view='login'"
+                  class="w-full sm:w-auto px-6 py-3 font-semibold rounded-lg bg-slate-900/80 hover:bg-slate-800 transition-colors duration-200 border border-slate-700 text-sm tracking-tight"
+                >
+                    Login
+                </button>
+                <button
+                  @click="view='signup'"
+                  class="w-full sm:w-auto px-6 py-3 font-semibold rounded-lg text-slate-50 bg-gradient-to-r from-sky-500 to-indigo-500 hover:opacity-90 transition-opacity duration-200 flex items-center justify-center gap-2 text-sm tracking-tight"
+                >
+                    Sign Up Now
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <div
+          x-data="authForm()"
+          x-effect="view"
+          x-show="view!=='landing'"
+          x-transition:enter="transition ease-out duration-300"
+          x-transition:enter-start="opacity-0 transform scale-90"
+          x-transition:enter-end="opacity-100 transform scale-100"
+          x-transition:leave="transition ease-in duration-200"
+          x-transition:leave-start="opacity-100 transform scale-100"
+          x-transition:leave-end="opacity-0 transform scale-90"
+          class="bg-slate-800/50 backdrop-blur-sm p-8 rounded-xl border border-slate-700 text-left"
+          style="display:none;"
+        >
+            <button
+              @click="view='landing';error='';"
+              class="absolute top-4 left-4 text-slate-400 hover:text-white transition-colors"
+            >
+                <i data-lucide="arrow-left"></i>
+            </button>
+            <template x-if="view==='login'">
+                <div>
+                    <h2 class="text-3xl font-semibold mb-6 font-display tracking-tight">Login</h2>
+                    <form @submit.prevent="submit('signin')" class="space-y-4">
+                        <input
+                          autocomplete="username"
+                          type="text"
+                          x-model="username"
+                          placeholder="Username"
+                          required
+                          class="w-full p-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm"
+                        >
+                        <input
+                          autocomplete="current-password"
+                          type="password"
+                          x-model="password"
+                          placeholder="Password"
+                          required
+                          class="w-full p-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm"
+                        >
+                        <p
+                          x-text="error"
+                          x-show="error"
+                          class="text-rose-400 text-sm h-5 !-mt-2 text-center"
+                        ></p>
+                        <button
+                          type="submit"
+                          :disabled="loading"
+                          class="w-full py-3 font-semibold rounded-lg text-slate-50 bg-gradient-to-r from-sky-500 to-indigo-500 hover:opacity-90 transition-opacity flex items-center justify-center disabled:opacity-50 text-sm"
+                        >
+                            <span x-show="!loading">Login</span>
+                            <i
+                              x-show="loading"
+                              data-lucide="loader-2"
+                              class="animate-spin w-6 h-6"
+                            ></i>
+                        </button>
+                    </form>
+                </div>
+            </template>
+            <template x-if="view==='signup'">
+                <div>
+                    <h2 class="text-3xl font-semibold mb-6 font-display tracking-tight">Create Account</h2>
+                    <form @submit.prevent="submit('signup')" class="space-y-4">
+                        <input
+                          autocomplete="off"
+                          type="text"
+                          x-model="username"
+                          placeholder="Username"
+                          required
+                          class="w-full p-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                        >
+                        <input
+                          autocomplete="new-password"
+                          type="password"
+                          x-model="password"
+                          placeholder="Password"
+                          required
+                          class="w-full p-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                        >
+                        <p
+                          x-text="error"
+                          x-show="error"
+                          class="text-rose-400 text-sm h-5 !-mt-2 text-center"
+                        ></p>
+                        <button
+                          type="submit"
+                          :disabled="loading"
+                          class="w-full py-3 font-semibold rounded-lg text-slate-50 bg-gradient-to-r from-sky-500 to-indigo-500 hover:opacity-90 transition-opacity flex items-center justify-center disabled:opacity-50 text-sm"
+                        >
+                            <span x-show="!loading">Sign Up</span>
+                            <i
+                              x-show="loading"
+                              data-lucide="loader-2"
+                              class="animate-spin w-6 h-6"
+                            ></i>
+                        </button>
+                    </form>
+                </div>
+            </template>
+        </div>
+    </main>
+
+    <footer class="absolute bottom-4 left-0 right-0 text-center text-slate-500 text-sm z-10 flex items-center justify-center gap-2 flex-wrap px-4">
+        <a href="/acceptable-use" class="hover:text-slate-300 transition-colors">Acceptable Use</a>
+    </footer>
+
+    <style>
+      .animate-blob{animation:blob 7s infinite}
+      .animation-delay-4000{animation-delay:-4s}
+      @keyframes blob{
+        0%,100%{transform:translate(0,0) scale(1)}
+        33%{transform:translate(30px,-50px) scale(1.1)}
+        66%{transform:translate(-20px,20px) scale(.9)}
+      }
+    </style>
+    <script>lucide.createIcons();</script>
+    <script src="https://cdn.jsdelivr.net/npm/scrypt-js@3.0.1/scrypt.min.js"></script>
+    <script>
+      document.querySelectorAll("[data-site-host]").forEach(element => {
+        element.textContent = window.location.host;
+      });
+
+      function authForm(){
+        return{
+          username:"",
+          password:"",
+          error:"",
+          loading:!1,
+          async submit(e){
+            this.loading=!0,
+            this.error="";
+            try{
+              const t=new TextEncoder,
+                    s=t.encode(this.password),
+                    o=t.encode(this.username.padEnd(16,"0").substring(0,16)),
+                    a=await scrypt.scrypt(s,o,16384,8,1,32),
+                    n=Array.from(a).map(r=>r.toString(16).padStart(2,"0")).join(""),
+                    i=await fetch(`/api/${e}`,{
+                      method:"POST",
+                      headers:{"Content-Type":"application/json"},
+                      body:JSON.stringify({
+                        username:this.username,
+                        pass_hash:n
+                      })
+                    });
+              if(!i.ok)
+                throw new Error(await i.text()||"An error occurred");
+              const l=await i.json();
+              localStorage.setItem("pass_hash",n),
+              localStorage.setItem("username",l.username),
+              window.location.href="/dash/"
+            }catch(t){
+              this.error=t.message
+            }finally{ this.loading=!1 }
+          }
+        }
+      }
+    </script>
+</body>
+</html>

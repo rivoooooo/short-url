@@ -1,0 +1,48 @@
+const ntfy = (env,title,msg,p=3) =>
+  env.NTFY_URL
+    ? fetch(env.NTFY_URL,{
+        method:"POST",
+        headers:{
+          "Title":`🆕 ${title}`,
+          "Priority":String(p),
+          "Content-Type":"text/plain"
+        },
+        body:msg
+      }).catch(()=>{})
+    : Promise.resolve();
+
+export async function onRequestPost({ request, env }) {
+  try {
+    const body = await request.json();
+
+    const { username, pass_hash } = body;
+    if (!username || !pass_hash)
+      return new Response("Missing fields",{ status:400 });
+
+    if (
+      await env.D1_EV
+        .prepare("SELECT 1 FROM users WHERE username = ?")
+        .bind(username)
+        .first()
+    ) return new Response("User already exists",{ status:409 });
+
+    await env.D1_EV
+      .prepare("INSERT INTO users (username, pass_hash) VALUES (?, ?)")
+      .bind(username,pass_hash)
+      .run();
+
+    const { country, region, city } = request.cf || {};
+    const loc = [city, region, country].filter(Boolean).join(", ") || "Unknown";
+
+    await ntfy(
+      env,
+      "auth-signup",
+      `event=signup\nuser=${username}\nloc=${loc}`,
+      3
+    );
+
+    return Response.json({ success:true, username },{ status:201 });
+  } catch (e) {
+    return new Response(e.message,{ status:500 });
+  }
+}

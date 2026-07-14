@@ -1,0 +1,19 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "short-url",
+	"pages_build_output_dir": ".",
+	"compatibility_date": "2026-07-14",
+	"kv_namespaces": [
+		{
+			"binding": "KV_EV",
+			"id": "7f3d413fb7464ae2bf3d983e52815845"
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "D1_EV",
+			"database_name": "short-link-db",
+			"database_id": "38680b09-f4a6-4dca-b223-df36dd9bf6cd"
+		}
+	]
+}
